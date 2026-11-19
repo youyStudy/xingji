@@ -1,0 +1,264 @@
+/* 版式底座 —— 所有页面共享的地基与「揭示 / 微交互」工具类 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* 极淡的纸纹：两枚 1px 斜向渐变的网点，几乎看不见，但让纯白有呼吸 */
+  background-image: radial-gradient(rgba(21, 23, 27, 0.018) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+h1, h2, h3, h4, p {
+  margin: 0;
+  font-weight: 400;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--blue);
+  color: var(--blue-ink);
+}
+
+/* 焦点可见 —— 无障碍底线 */
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ===== 布局容器 ===== */
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gut);
+}
+.wrap-read {
+  max-width: var(--maxw-read);
+  margin-inline: auto;
+}
+
+/* ===== 排版元件 ===== */
+.eyebrow {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--blue);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.eyebrow::before {
+  content: "";
+  width: 26px;
+  height: 1px;
+  background: var(--blue-line);
+  display: inline-block;
+}
+.serif {
+  font-family: var(--f-cjk-serif);
+}
+.display {
+  font-family: var(--f-display);
+  font-optical-sizing: auto;
+}
+
+/* ===== 滚动揭示：IntersectionObserver 给元素加 .is-in ===== */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition:
+    opacity var(--t-slow) var(--ease),
+    transform var(--t-slow) var(--ease);
+  transition-delay: var(--d, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+/* 变体：从下方更远滑入 + 轻微放大，用于主标题 */
+.reveal-rise {
+  opacity: 0;
+  transform: translate3d(0, 40px, 0) scale(0.985);
+  filter: blur(2px);
+  transition:
+    opacity var(--t-slow) var(--ease),
+    transform var(--t-slow) var(--ease),
+    filter var(--t-slow) var(--ease);
+  transition-delay: var(--d, 0ms);
+}
+.reveal-rise.is-in {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* ===== 按钮微交互：hover 微放大，active 微缩，按下即回弹 ===== */
+.btn {
+  --btn-bg: var(--blue);
+  --btn-fg: var(--blue-ink);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-family: var(--f-body);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--btn-fg);
+  background: var(--btn-bg);
+  cursor: pointer;
+  transition:
+    transform var(--t-fast) var(--ease),
+    box-shadow var(--t-base) var(--ease),
+    background var(--t-base) var(--ease),
+    color var(--t-base) var(--ease),
+    border-color var(--t-base) var(--ease);
+  will-change: transform;
+}
+.btn:hover {
+  transform: scale(1.035);
+  box-shadow: var(--shadow-lift);
+}
+.btn:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-1);
+}
+.btn svg {
+  transition: transform var(--t-base) var(--ease);
+}
+.btn:hover svg {
+  transform: translateX(3px);
+}
+
+.btn-ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--ink);
+  border-color: var(--hair);
+}
+.btn-ghost:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  box-shadow: var(--shadow-1);
+}
+
+/* 图标按钮的圆点微动 */
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--hair);
+  background: var(--paper);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: transform var(--t-fast) var(--ease),
+    border-color var(--t-base) var(--ease), color var(--t-base) var(--ease);
+}
+.icon-btn:hover {
+  transform: scale(1.08);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+.icon-btn:active {
+  transform: scale(0.94);
+}
+
+/* 链接下划线：从中心向两端抽出的「画线」 */
+.ul-draw {
+  position: relative;
+  padding-bottom: 2px;
+}
+.ul-draw::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transition: left var(--t-base) var(--ease), right var(--t-base) var(--ease);
+}
+.ul-draw:hover::after {
+  left: 0;
+  right: 0;
+}
+
+/* ===== Vue <Transition> 通用淡入上移 ===== */
+.fade-up-enter-active,
+.fade-up-leave-active {
+  transition: opacity var(--t-base) var(--ease), transform var(--t-base) var(--ease);
+}
+.fade-up-enter-from {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+}
+.fade-up-leave-to {
+  opacity: 0;
+  transform: translate3d(0, -12px, 0);
+}
+
+/* ===== Morph：TransitionGroup 的 FLIP 位移动画（签名动效） ===== */
+.morph-move {
+  transition: transform var(--t-morph) var(--ease);
+}
+.morph-enter-active {
+  transition: opacity var(--t-base) var(--ease), transform var(--t-base) var(--ease);
+}
+.morph-leave-active {
+  transition: opacity var(--t-base) var(--ease), transform var(--t-base) var(--ease),
+    max-height var(--t-base) var(--ease) 120ms, margin var(--t-base) var(--ease) 120ms;
+  overflow: hidden;
+}
+.morph-enter-from {
+  opacity: 0;
+  transform: translate3d(-14px, 0, 0);
+}
+.morph-leave-to {
+  opacity: 0;
+  transform: translate3d(22px, 0, 0) scale(0.96);
+}
+
+.hair-rule {
+  height: 1px;
+  background: var(--hair-2);
+  border: 0;
+}
+
+/* 锚点跳转时给吸顶栏留出呼吸位 */
+[id] {
+  scroll-margin-top: 92px;
+}
+
+/* 顶栏：随滚动从透明变实底 */
+@media (max-width: 720px) {
+  .nav-links {
+    display: none;
+  }
+}

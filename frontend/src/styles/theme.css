@@ -1,0 +1,488 @@
+/* ============================================================================
+   行迹 · theme.css —— 视觉语言层（Tier1 画板 → Tier2 语义角色 → 尺度 / 排版 / 动效）
+
+   来源：reference-study/styles/tokens.md（每条数值带实测出处）
+         reference-study/observations/animation-notes.md（动效配方）
+
+   两级 token 法（照搬参考站结构）：
+     Tier 1  --pal-*    原始画板，与主题无关，只在这里定义一次
+     Tier 2  --bg-base / --text-* / --hero-* …  语义角色：浅色值放 :root，
+             深色值在 body.night 里整体重指一次 → 组件只写 var(--语义名)，
+             换主题 = 换一层映射，组件零改动。
+
+   加载顺序（main.js）：theme.css → tokens.css → base.css
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   Tier 1 · 原始画板（与主题无关）  —— 参考站 site.css:15-32 的 --c-* 系列
+   --------------------------------------------------------------------------- */
+:root {
+  /* 暖色基底：参考站的主色其实是「米白」，不是白 */
+  --pal-cream: #fff9f1;       /* --c-cream：页面主背景 */
+  --pal-cream-2: #fff9e9;     /* --c-cream-2：亮一档，nav 文字 / hero 标题 */
+  --pal-sand: #eee8d2;        /* --c-sand：抬起的暖表面（山景区 / 页脚） */
+
+  /* 墨与纸 */
+  --pal-ink: #060606;         /* --c-ink：正文近黑（不是纯黑） */
+  --pal-black: #000;          /* --c-black：只用于文字 */
+  --pal-white: #fff;          /* --c-white：白底按钮 / 夜模式圆盘 */
+
+  /* 两个强调色 —— 职责严格分离，不要互相顶替 */
+  --pal-gold: #ffda3f;        /* --c-gold：唯一的「可吃」强调（进度 / 在线点 / 音波 / 装载器） */
+  --pal-coral: #fc9073;       /* --c-coral：只做交互反馈（hover / 链接 / 焦点圈） */
+
+  /* 夜 */
+  --pal-night: #0a0a0f;       /* --c-night：夜页面底，偏蓝的近黑 */
+  --pal-navy: #111c36;        /* --c-navy：夜的「抬起表面」 */
+  --pal-navy-1: #1f3b6d;      /* --c-navy-1：夜 hero 渐变起点 */
+  --pal-navy-2: #031835;      /* --c-navy-2：夜 hero 渐变终点 */
+  --pal-blue-start: #71b7f4;  /* --c-blue-start：日 hero 渐变起点 */
+  --pal-toggle-navy: #0c1b42; /* --c-toggle-navy：夜间圆盘底 */
+  --pal-border-dark: #343434; /* --c-border-dark：夜间描边 */
+
+  /* 行迹自有：原「印泥红」，保留为异常 / 未核验的语义色 */
+  --pal-seal: #b1342a;
+  --pal-seal-wash: #f7e8e6;
+  /* 行迹自有：原「晒蓝」，降为二级强调（与 hero 天蓝同族） */
+  --pal-blue: #0f3d63;
+  --pal-blue-mid: #1e5b8c;
+  --pal-blue-bright: #2f7bb5;
+
+  /* 派生：给 rgba 用的 RGB 三元组（改 --pal-ink 一处全站跟随） */
+  --ink-rgb: 6 6 6;
+  --cream-rgb: 255 249 241;
+  --white-rgb: 255 255 255;
+}
+
+/* ---------------------------------------------------------------------------
+   Tier 2 · 语义角色 —— 浅色（日）
+   与参考站同名核对：site.css:42-57 的 15 个角色 token
+   --------------------------------------------------------------------------- */
+:root {
+  /* 面 */
+  --bg-base: var(--pal-cream);        /* --bg-base：页面底 / 大区块底 / 跑马灯淡出遮罩 */
+  --surface-raised: var(--pal-sand);  /* --surface-raised：抬起表面（山景 / 页脚 / 浪冠） */
+  --surface-sink: #f6efdf;            /* 沉一层的面（凹槽、卡片底） */
+
+  /* 字 —— 弱化一律用「同色 + 透明度」，禁止引入灰阶 */
+  --ink: var(--pal-ink);
+  --text-heading: var(--pal-black);
+  --text-title: rgb(0 0 0 / 0.9);
+  --text-eyebrow: rgb(0 0 0 / 0.5);
+  --text-contrast: var(--pal-black);
+  --text-muted-1: rgb(var(--ink-rgb) / 0.72);
+  --text-muted-2: rgb(var(--ink-rgb) / 0.55);
+
+  /* 头发丝（不是灰，是墨被纸稀释） */
+  --hair: rgb(var(--ink-rgb) / 0.14);
+  --hair-2: rgb(var(--ink-rgb) / 0.08);
+  --hair-3: rgb(var(--ink-rgb) / 0.04);
+
+  /* 项目卡 hover 遮罩（配 backdrop-filter: blur(7.7px)） */
+  --overlay-scrim: rgb(var(--cream-rgb) / 0.7);
+
+  /* hero / 移动菜单的径向渐变两端 */
+  /* 参考站 site.css:29-30/51-52：天蓝 → 湖蓝（站点里 --hero-to 常被局部覆写成更深的 #3f76ad） */
+  --hero-from: var(--pal-blue-start);
+  --hero-to: #4a86b8;
+
+  /* 圆盘控件三件套（底 / 描边 / 旋钮） */
+  --toggle-track: var(--pal-white);
+  --toggle-border: #e7dfcd;
+
+  /* 焦点圈 + 引导线描边 */
+  --focus-ring: var(--pal-ink);
+  --trail-stroke: var(--pal-black);
+
+  /* 语义强调：组件只读这三个 */
+
+  /* 参考站同名别名：另一个组件（chrome 移植）按参考站原名引用这几个，保留 */
+  --gold: var(--pal-gold);
+  --coral: var(--pal-coral);
+  --cream-2: var(--pal-cream-2);
+
+  /* 行迹保有：印章红，只用于「未核验 / 异常」 */
+  --seal: var(--pal-seal);
+  --seal-wash: var(--pal-seal-wash);
+  --seal-line: rgb(177 52 42 / 0.28);
+}
+
+/* ---------------------------------------------------------------------------
+   Tier 2 · 语义角色 —— 深色（夜）
+   参考站 body.night 单块重指（site.css:1298-1314）；强调色不随主题漂移。
+   --------------------------------------------------------------------------- */
+body.night {
+  color-scheme: dark;
+  --bg-base: var(--pal-night);
+  --surface-raised: var(--pal-navy);
+  --surface-sink: #0d1730;
+
+  --ink: var(--pal-cream);
+  --text-heading: var(--pal-cream);
+  --text-title: var(--pal-cream);
+  --text-eyebrow: var(--pal-cream);
+  --text-contrast: var(--pal-white);
+  --text-muted-1: rgb(255 249 241 / 0.72);
+  --text-muted-2: rgb(255 249 241 / 0.55);
+
+  --hair: rgb(255 249 241 / 0.16);
+  --hair-2: rgb(255 249 241 / 0.1);
+  --hair-3: rgb(255 249 241 / 0.05);
+
+  --overlay-scrim: rgb(0 0 0 / 0.7);
+
+  --hero-from: var(--pal-navy-1);
+  --hero-to: var(--pal-navy-2);
+
+  --toggle-track: var(--pal-toggle-navy);
+  --toggle-border: var(--pal-border-dark);
+
+  --focus-ring: var(--pal-cream);
+  --trail-stroke: var(--pal-cream);
+
+}
+
+/* ---------------------------------------------------------------------------
+   功能页中性色（探索 / 行程 / 个人中心·相册）：白底 + 浅灰面。
+   由 router.afterEach 按 meta.neutral 挂 body.app-neutral；首页保留奶油色。
+   只重指「面」与暖色派生值，字色 / 发丝 / 强调色不动。
+   --------------------------------------------------------------------------- */
+body.app-neutral {
+  --bg-base: #ffffff;
+  --surface-raised: #f7f8fa;
+  --surface-sink: #f1f3f5;
+  /* --paper 系在 :root 已按奶油色求值并继承，必须在本层重新声明才会用上面的新值 */
+  --paper: var(--bg-base);
+  --paper-raise: var(--surface-raised);
+  --paper-sink: var(--surface-sink);
+  --blue-wash: rgb(15 61 99 / 0.06);
+  --overlay-scrim: rgb(var(--white-rgb) / 0.7);
+  --toggle-border: #e3e6ea;
+  --shadow-1: 0 1px 2px rgb(20 24 30 / 0.05), 0 2px 8px rgb(20 24 30 / 0.04);
+  --shadow-2: 0 8px 24px rgb(20 24 30 / 0.08), 0 2px 6px rgb(20 24 30 / 0.05);
+}
+body.night.app-neutral {
+  --bg-base: #0e1013;
+  --surface-raised: #16191e;
+  --surface-sink: #12151a;
+}
+
+/* ---------------------------------------------------------------------------
+   基础：页面底色 / 正文跟随主题自动翻转（参考站 site.css:69-75）
+   注：base.css 里 body 用的是 var(--paper)，tokens.css 已把 --paper 指向 --bg-base。
+   --------------------------------------------------------------------------- */
+body {
+  background: var(--bg-base);
+  color: var(--ink);
+  font-family: var(--f-sans);
+  transition: background-color 0.45s ease, color 0.45s ease;
+}
+
+/* 主题切换：View Transitions 交叉淡入（参考站 site.css:1316-1334） */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.45s;
+  animation-timing-function: ease;
+}
+/* ★ 根因修复：旧页面根结点的 transition（见 tokens.css / ProfileView 等）会让 <main> 成为
+   「包含块」，sticky hero 被迫相对 main 定位；同时 <main> 居中 → 切夜时整页跳到 (±720, ∓4277)。
+   新首页根结点显式关掉 transition，并让 sticky 的参照回到视口方向。 */
+.route-view {
+  transition: none !important;
+}
+
+/* 无 View Transitions：body.theme-fading 期间把所有 token 驱动的颜色一起淡过去 */
+body.theme-fading,
+body.theme-fading * {
+  transition: background-color 0.45s ease, color 0.45s ease,
+    border-color 0.45s ease, fill 0.45s ease, stroke 0.45s ease !important;
+}
+/* ---------------------------------------------------------------------------
+   字体族 —— 四族分工（computed fontFamily 频次 38 / 20 / 17 / 4）。
+   中文兜底：serif → 宋体系；sans → 苹方 / 雅黑；不引中文 webfont，离线可落版。
+   --------------------------------------------------------------------------- */
+:root {
+  --f-serif: "DM Serif Display", "Noto Serif SC", "Source Han Serif SC",
+    "Songti SC", "SimSun", Georgia, serif;
+  --f-sans: "Space Grotesk", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB",
+    "Noto Sans SC", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas,
+    monospace;
+}
+
+/* ---------------------------------------------------------------------------
+   字号阶梯（px 绝对值 + 断点换档；参考站不是 rem 体系）
+   --------------------------------------------------------------------------- */
+:root {
+  /* Display —— DM Serif Display 只有 400，永远不要加粗 */
+  --fs-display: 156px;
+  --fs-display-cjk: clamp(40px, 7.2vw, 96px);  /* 中文标题专用的收敛档 */
+
+  /* Headline / Title —— Space Grotesk */
+  --fs-h1: 40px;
+  --fs-h2: 32px;
+
+  /* Body */
+  --fs-body: 16px;
+
+  /* Label —— JetBrains Mono，全部 uppercase，不超过 14px */
+  --fs-eyebrow: 14px;
+  --fs-label: 12px;
+
+  /* 行高 */
+  --lh-body: 1.358;  /* 全站正文统一（不是 1.5） */
+  --lh-snug: 1.2;
+}
+
+@media (max-width: 1536px) {
+  :root {
+    --fs-display: 136px;
+    --fs-h1: 36px;
+    --fs-h2: 28px;
+  }
+}
+@media (max-width: 1100px) {
+  :root {
+    --fs-display: 96px;
+    --fs-h1: 30px;
+    --fs-h2: 25px;
+  }
+}
+@media (max-width: 640px) {
+  :root {
+    --fs-display: clamp(46px, 14.5vw, 120px);
+    --fs-h1: 26px;
+    --fs-h2: 22px;
+    --fs-body: 15px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   字距 —— 符号方向是这套排版的命门：
+     Sans 标题 -0.04em（收紧）  |  Serif Display +0.02em（拉开）  |  Mono 标签 +0.1~0.16em
+   来源 tokens.md §4（computed letterSpacing 频次）
+   --------------------------------------------------------------------------- */
+:root {
+  --ls-display: 3.1px;        /* 156px 时约 +0.02em */
+  --ls-tight-lg: -1.6px;      /* 40px 级 = -0.04em */
+  --ls-tight-md: -1.28px;     /* 32px 级 = -0.04em */
+  --ls-tight-xs: -0.64px;     /* 16px 级 = -0.04em */
+  --ls-label: 1.4px;          /* mono 14px */
+  --ls-label-sm: 1.6px;
+}
+
+/* ---------------------------------------------------------------------------
+   圆角 —— 只走两端：全圆 或 大弧；不要 12/16/24 这类中间档
+   来源 computed radius 频次：9999px(10) / 50%(7) / 999px(6) / 40px(4) / 34px(3)
+   --------------------------------------------------------------------------- */
+:root {
+  --r-pill: 9999px;   /* 胶囊容器：nav、唱片机、音轨 */
+  --r-round: 50%;     /* 正圆：头像、圆盘按钮、小圆点 */
+  --r-glass: 34px;    /* 玻璃证言卡 */
+  --r-sm: 4px;        /* 最小圆角 */
+  --r-md: 10px;
+  --r-lg: 18px;
+}
+
+/* ---------------------------------------------------------------------------
+   阴影 —— 平面上几乎零投影；只授权给「拟物」与「玻璃」两类
+   来源 computed shadow（tokens.md §7）
+   --------------------------------------------------------------------------- */
+:root {
+  --shadow-glass: 4px 4px 20px rgb(0 0 0 / 0.3);            /* 玻璃卡 */
+  --bevel-glass-top: inset 0 4px 6px rgb(255 255 255 / 0.25); /* 玻璃胶囊顶部高光 */
+  --bevel-control: inset 0 1px 3px rgb(0 0 0 / 0.1);        /* 圆盘控件内陷 */
+  /* 旧组件的两级轻阴影，值已调暖以匹配米白底 */
+  --shadow-1: 0 1px 2px rgb(60 45 20 / 0.05), 0 2px 8px rgb(60 45 20 / 0.04);
+  --shadow-2: 0 8px 24px rgb(60 45 20 / 0.08), 0 2px 6px rgb(60 45 20 / 0.05);
+  --shadow-lift: 0 18px 40px -12px rgb(30 58 95 / 0.28);
+}
+
+/* ---------------------------------------------------------------------------
+   层级 —— 与参考站一致的层叠顺序（tokens.md §10）
+   --------------------------------------------------------------------------- */
+:root {
+}
+
+/* ---------------------------------------------------------------------------
+   间距 —— 参考站没有尺度系统，这张表是从规则值反推的常用档（tokens.md §9）
+   --------------------------------------------------------------------------- */
+:root {
+  /* 语义分级（来自抽屉组件的注释：block 必须明显大于 field，否则整块读作一列） */
+}
+
+/* ---------------------------------------------------------------------------
+   动效 —— 5 条常驻曲线 + 时长档位（频次见 tokens.md §12）
+   e-pop  回弹 : 缩放 / 逐字抬起 / 开花 / 弹入
+   e-snap 利落 : 进入 / 展开 / 生长 / 幕布打开（全站用得最多，41+7 次）
+   e-roll 滚词 : 带轻微过冲的纵向滚动（词轮播）
+   e-ease 通用 : 描边 / 遮罩 / 淡入
+   e-fade 柔和 : 通用入场揭示（对应旧 --ease 的视觉语义）
+   --------------------------------------------------------------------------- */
+:root {
+  --e-snap: cubic-bezier(0.22, 1, 0.36, 1);
+  --e-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --e-fade: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* 特例曲线，按需引用 */
+
+  --t-fast: 0.18s;
+  --t-base: 0.35s;
+  --t-reveal: 0.85s;
+  --t-slow: 0.62s;
+  --t-morph: 0.72s;
+}
+
+/* ---------------------------------------------------------------------------
+   减少动效 —— 时长归零到 1ms（保留一帧，保证 transitionend 仍会触发）
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 1ms;
+    --t-base: 1ms;
+    --t-reveal: 1ms;
+    --t-slow: 1ms;
+    --t-morph: 1ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+  body.theme-fading,
+  body.theme-fading * {
+    transition: none !important;
+  }
+}
+/* ---------------------------------------------------------------------------
+   排版工具类 —— 与 token 一一对应，组件里直接套 class
+   （旧的 .display / .serif 在 tokens.css 里改为指向本层的 --f-serif）
+   --------------------------------------------------------------------------- */
+.t-display {
+  font-family: var(--f-serif);
+  font-weight: 400;              /* DM Serif Display 只有 400 */
+  font-size: var(--fs-display);
+  letter-spacing: var(--ls-display);
+  line-height: normal;
+  color: var(--text-heading);
+}
+.t-display-cjk {
+  font-family: var(--f-serif);
+  font-weight: 400;
+  font-size: var(--fs-display-cjk);
+  letter-spacing: var(--ls-tight-lg);
+  line-height: var(--lh-snug);
+  color: var(--text-heading);
+}
+.t-h1 {
+  font-family: var(--f-sans);
+  font-weight: 400;
+  font-size: var(--fs-h1);
+  letter-spacing: var(--ls-tight-lg);
+  line-height: var(--lh-body);
+  color: var(--text-heading);
+}
+.t-h2 {
+  font-family: var(--f-sans);
+  font-weight: 400;
+  font-size: var(--fs-h2);
+  letter-spacing: var(--ls-tight-md);
+  line-height: var(--lh-body);
+  color: var(--text-heading);
+}
+.t-eyebrow {
+  font-family: var(--f-mono);
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--text-eyebrow);
+}
+.t-label {
+  font-family: var(--f-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--ls-label-sm);
+  text-transform: uppercase;
+  color: var(--text-muted-2);
+}
+.t-body {
+  font-family: var(--f-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-tight-xs);
+  color: var(--ink);
+}
+
+/* ---------------------------------------------------------------------------
+   圆盘控件（日/夜开关、音波按钮同款三件套；参考站 .day-toggle）
+   --------------------------------------------------------------------------- */
+.disc-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: var(--r-round);
+  background: var(--toggle-track);
+  border: 1px solid var(--toggle-border);
+  box-shadow: var(--bevel-control);
+  color: var(--ink);
+  cursor: pointer;
+  overflow: hidden;
+  transition: background-color 0.35s ease, border-color 0.35s ease,
+    box-shadow 0.35s ease, transform 0.2s ease;
+}
+.disc-btn:hover {
+  transform: scale(1.06);
+}
+.disc-btn:active {
+  transform: scale(0.94);
+}
+
+/* ---------------------------------------------------------------------------
+   玻璃拟态（参考站 .nav-pill / .t-card 两个配方，tokens.md §7.2）
+   ★ 性能约束：backdrop-filter 不超过 18px，且背后内容不要持续动画。
+   --------------------------------------------------------------------------- */
+.glass-pill {
+  border-radius: var(--r-pill);
+  background: rgb(var(--white-rgb) / 0.2);
+  border: 1px solid rgb(var(--white-rgb) / 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--bevel-glass-top);
+}
+.glass-card {
+  border-radius: var(--r-glass);
+  background: linear-gradient(180deg, rgb(251 252 248 / 0.5) 0%, rgb(149 150 148 / 0.5) 100%);
+  border: 1px solid #999;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-glass);
+}
+
+/* ---------------------------------------------------------------------------
+   通用入场揭示（参考站 .reveal：26px 上移 + 淡入，0.85s，只播一次）
+   与 base.css 里既有的 .reveal / .reveal-rise 并存，互不覆盖（类名不同）。
+   --------------------------------------------------------------------------- */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity var(--t-reveal) var(--e-fade),
+    transform var(--t-reveal) var(--e-fade);
+  transition-delay: var(--d, 0s);
+}
+.reveal-up.is-in {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-up {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

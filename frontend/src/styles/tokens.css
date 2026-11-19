@@ -1,0 +1,98 @@
+/* 行迹 · tokens.css —— 兼容层（compatibility layer）
+
+   旧组件（TopBar / AppNav / ProfileView / TripsView / MapPanel / AuthModal …）
+   引用的 42 个 token 名**一个都没有删**，全部改为指向新语义层 src/styles/theme.css。
+   语义：纸 = 页面底，墨 = 正文，蓝 = 二级强调，印泥红 = 只用于「未核验 / 异常」。
+
+   加载顺序（main.js）：theme.css → tokens.css → base.css
+   规则：本文件**只做映射**，不新增视觉值。要做视觉调整请去 theme.css。
+   （旧文件里那个「几乎看不见的网点纸纹」由 base.css 自己绘制，不在 token 层。） */
+
+:root {
+  /* ---- 纸与字：全部接到 Tier2 语义层，跟随日/夜主题 ---- */
+  --paper: var(--bg-base);            /* 主背景（base.css 的 body 背景就是它） */
+  --paper-raise: var(--surface-raised);
+  --paper-sink: var(--surface-sink);
+
+  --ink: var(--pal-ink);   /* 浅色墨值：与 theme.css 的 :root --ink 同值，保持旧文件语义不变 */
+  /* 三级弱化：不再用灰色，改用「墨 + 透明度」（参考站同款规则） */
+  --ink-2: var(--text-muted-1);
+  --ink-3: var(--text-muted-2);
+  --ink-4: rgb(var(--ink-rgb) / 0.4);
+
+  /* ---- 头发丝：已经是 Tier2 语义名（theme.css 定义），这里不再重复映射 ---- */
+
+  /* ---- 晒蓝 cyanotype：保留为二级强调（原值不变，不随主题翻转） ---- */
+  --blue: var(--pal-blue);
+  --blue-mid: var(--pal-blue-mid);
+  --blue-bright: var(--pal-blue-bright);
+  --blue-wash: rgb(var(--cream-rgb) / 0.55);  /* 极淡蓝底 → 暖米底的淡洗色，与主色系同温 */
+  --blue-line: rgb(15 61 99 / 0.22);          /* 半透明主线，给发丝级下划线用 */
+  --blue-ink: var(--pal-cream-2);             /* 深蓝底上的字 */
+
+  /* ---- 印泥红：只用于「异常 / 未核验」，别处绝不出现 ---- */
+  --seal: var(--pal-seal);
+  --seal-wash: var(--pal-seal-wash);
+  /* --seal-line 同 --hair：theme.css 已定义，直接沿用 */
+
+  /* ---- 字体 ---- */
+  --f-display: var(--f-serif);        /* 旧名「出版级西文」→ 现在的衬线主标题族 */
+  --f-cjk-serif: var(--f-serif);      /* 中文衬线：DM Serif Display 回落到宋体系 */
+  --f-body: var(--f-sans);            /* 旧名「正文族」→ Space Grotesk + 中文黑体 */
+  /* --f-mono 同名，theme.css 已定义，旧组件直接可用 */
+
+  /* ---- 尺度 ---- */
+  --maxw: 1180px;
+  --maxw-read: 760px;
+  --gut: clamp(20px, 5vw, 64px);
+  --r-sm: 4px;
+  --r-md: 10px;
+  --r-lg: 18px;
+
+  /* ---- 阴影：旧的两级轻阴影保留（值已在 theme.css 调暖） ---- */
+  /* --shadow-1 / -2 / --shadow-lift 名称不变，值在 theme.css 里已调暖 */
+
+  /* ---- 参考站同名别的名别名：chrome 移植组件（页脚花园 / hero 天空）可能直接按参考站
+     原名引用这几个；参考站里 --cream-text 就是 --c-cream-2，这里一并对齐，
+     免得组件的颜色悄悄落空。---- */
+  --cream-text: var(--pal-cream-2);
+  --cream: var(--pal-cream);
+  --dark: var(--pal-ink);
+
+  /* ---- 动效：签名缓动 = 参考站第一主力曲线 e-snap ---- */
+  --ease: var(--e-snap);
+  --ease-soft: var(--e-ease);
+  --t-fast: 180ms;
+  --t-base: 340ms;
+  --t-slow: 620ms;
+  --t-morph: 720ms;
+}
+
+
+/* 夜模式：--ink / --paper / --hair 全部经由 theme.css 的语义层翻转，旧组件无需改动。
+   只有 --ink-2/-3/-4 在旧文件里是固定灰值，夜里必须换成「米白 + 透明度」，
+   否则深底上的次级文字会消失。--paper 已映射到 --bg-base（夜里 = #0a0a0f）。 */
+body.night {
+  --ink: var(--pal-cream);
+  --ink-2: rgb(255 249 241 / 0.72);
+  --ink-3: rgb(255 249 241 / 0.55);
+  --ink-4: rgb(255 249 241 / 0.4);
+  --blue: var(--pal-blue-start);      /* 夜里深蓝不可读，升到天蓝 */
+  --blue-mid: var(--pal-blue-start);
+  --blue-bright: var(--pal-cream-2);
+  --blue-wash: rgb(0 0 0 / 0.25);
+  --blue-line: rgb(255 249 241 / 0.22);
+}
+
+/* 尊重减少动效偏好：所有揭示/形变退化为瞬时（与 theme.css 的 1ms 一致） */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 1ms;
+    --t-base: 1ms;
+    --t-slow: 1ms;
+    --t-morph: 1ms;
+  }
+  * {
+    scroll-behavior: auto !important;
+  }
+}

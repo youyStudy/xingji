@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>行迹 · 让每一个地点，都真实可去</title>
+    <meta
+      name="description"
+      content="行迹用大模型把一句想法生成成一棵可编辑的行程树，再把每一个地点拿到真实地图里确认——真实存在、能导航、能去，才会留在你的行程里。"
+    />
+    <meta name="theme-color" content="#0C2A44" />
+
+    <!-- 编辑级西文：Fraunces 做标题衬线，IBM Plex Mono 做编号/坐标/盖章标签。
+         中文交给系统的宋体（标题）与苹方/黑体（正文），离线也能落版，不拖首屏。 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <script>
+      /* 主题先于首帧落地：避免日→夜闪一下（参考站同款做法） */
+      try {
+        if (localStorage.getItem('xingji.theme') === 'night') document.body.classList.add('night');
+      } catch (e) {}
+    </script>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
