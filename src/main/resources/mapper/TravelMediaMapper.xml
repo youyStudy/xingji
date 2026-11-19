@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xingji.mapper.TravelMediaMapper">
+                        <!--是否使用数据库自动生成的主键  拿到数据库返回的主键值,赋值给Java实体类的哪个属性-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO travel_media (user_id, itinerary_id, place_id, region, title, media_type, file_path, file_size, upload_time)
+        VALUES (#{userId}, #{itineraryId}, #{placeId}, #{region}, #{title}, #{mediaType}, #{filePath}, #{fileSize}, #{uploadTime})
+    </insert>
+
+    <select id="findByUserId" resultType="TravelMedia">
+        SELECT * FROM travel_media
+        WHERE user_id = #{userId} AND deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findById" resultType="TravelMedia">
+        SELECT * FROM travel_media
+        WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <update id="softDelete">
+        UPDATE travel_media SET deleted = 1 WHERE id = #{id}
+    </update>
+
+    <update id="restore">
+        UPDATE travel_media SET deleted = 0 WHERE id = #{id}
+    </update>
+
+    <select id="findDeletedByUserId" resultType="TravelMedia">
+        SELECT * FROM travel_media
+        WHERE user_id = #{userId} AND deleted = 1
+        ORDER BY update_time DESC
+    </select>
+
+    <select id="findStaleDeleted" resultType="TravelMedia">
+        SELECT * FROM travel_media
+        WHERE deleted = 1 AND update_time &lt; #{cutoffTime}
+    </select>
+
+    <delete id="hardDeleteById">
+        DELETE FROM travel_media WHERE id = #{id}
+    </delete>
+
+</mapper>

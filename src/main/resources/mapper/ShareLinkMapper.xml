@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xingji.mapper.ShareLinkMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO share_link (itinerary_id, token, enabled)
+        VALUES (#{itineraryId}, #{token}, #{enabled})
+    </insert>
+
+    <select id="findByValidToken" resultType="ShareLink">
+        SELECT * FROM share_link
+        WHERE token = #{token} AND enabled = 1
+    </select>
+
+    <update id="disableByItineraryId">
+        UPDATE share_link SET enabled = 0
+        WHERE itinerary_id = #{itineraryId} AND enabled = 1
+    </update>
+
+</mapper>

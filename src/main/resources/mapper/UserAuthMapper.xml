@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xingji.mapper.UserAuthMapper">
+
+
+    <!-- user_auth 没做软删除，这里不加 deleted 过滤 -->
+    <select id="findByProviderAndOpenId" resultType="UserAuth">
+        SELECT * FROM user_auth
+        WHERE provider = #{provider} AND open_id = #{openId}
+    </select>
+
+    <!-- id 自增、create_time/update_time 走数据库默认值，都不写 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_auth (user_id, provider, open_id, union_id, nickname, avatar)
+        VALUES (#{userId}, #{provider}, #{openId}, #{unionId}, #{nickname}, #{avatar})
+    </insert>
+
+</mapper>

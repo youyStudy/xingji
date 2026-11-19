@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xingji.mapper.ItineraryNodeMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO itinerary_node (day_id, place_id, place_name, node_type, seq, start_time, end_time, cost)
+        VALUES (#{dayId}, #{placeId}, #{placeName}, #{nodeType}, #{seq}, #{startTime}, #{endTime}, #{cost})
+    </insert>
+
+    <select id="findByDayId" resultType="ItineraryNode">
+        SELECT * FROM itinerary_node
+        WHERE day_id = #{dayId}
+        ORDER BY seq ASC
+    </select>
+
+    <delete id="deleteByDayId">
+        DELETE FROM itinerary_node
+        WHERE day_id = #{dayId}
+    </delete>
+
+    <select id="findById" resultType="ItineraryNode">
+        SELECT * FROM itinerary_node WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE itinerary_node
+        SET day_id = #{dayId}, place_id = #{placeId}, place_name = #{placeName},
+            node_type = #{nodeType}, seq = #{seq}, start_time = #{startTime},
+            end_time = #{endTime}, cost = #{cost}, is_abnormal = #{isAbnormal}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM itinerary_node WHERE id = #{id}
+    </delete>
+
+    <select id="findByItineraryId" resultType="ItineraryNode">
+        SELECT n.* FROM itinerary_node n
+        JOIN itinerary_day d ON n.day_id = d.id
+        WHERE d.itinerary_id = #{itineraryId}
+        ORDER BY d.day_index, n.seq
+    </select>
+
+</mapper>

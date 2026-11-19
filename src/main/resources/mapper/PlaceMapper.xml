@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xingji.mapper.PlaceMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO place (name, amap_poi_id, longitude, latitude, city, category, address)
+        VALUES (#{name}, #{amapPoiId}, #{longitude}, #{latitude}, #{city}, #{category}, #{address})
+    </insert>
+
+    <select id="findById" resultType="Place">
+        SELECT * FROM place WHERE id = #{id}
+    </select>
+
+    <select id="findByAmapPoiId" resultType="Place">
+        SELECT * FROM place WHERE amap_poi_id = #{amapPoiId} LIMIT 1
+    </select>
+
+</mapper>

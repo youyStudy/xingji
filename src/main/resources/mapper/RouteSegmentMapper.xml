@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xingji.mapper.RouteSegmentMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO route_segment (itinerary_id, from_node_id, to_node_id, distance, duration, polyline)
+        VALUES (#{itineraryId}, #{fromNodeId}, #{toNodeId}, #{distance}, #{duration}, #{polyline})
+    </insert>
+
+    <select id="findByItineraryId" resultType="RouteSegment">
+        SELECT * FROM route_segment
+        WHERE itinerary_id = #{itineraryId}
+        ORDER BY id ASC
+    </select>
+
+    <delete id="deleteByItineraryId">
+        DELETE FROM route_segment WHERE itinerary_id = #{itineraryId}
+    </delete>
+
+</mapper>

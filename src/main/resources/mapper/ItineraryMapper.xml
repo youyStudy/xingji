@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xingji.mapper.ItineraryMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO itinerary (user_id, session_id, title, city, start_date, days, budget, advice, status)
+        VALUES (#{userId}, #{sessionId}, #{title}, #{city}, #{startDate}, #{days}, #{budget}, #{advice},
+                COALESCE(#{status}, 0))
+    </insert>
+
+    <select id="findById" resultType="Itinerary">
+        SELECT * FROM itinerary
+        WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <select id="findByUserId" resultType="Itinerary">
+        SELECT * FROM itinerary
+        WHERE user_id = #{userId} AND deleted = 0
+        ORDER BY pinned DESC, create_time DESC
+    </select>
+
+    <update id="update">
+        UPDATE itinerary
+        SET title = #{title}, city = #{city}, start_date = #{startDate}, days = #{days}, budget = #{budget}
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <select id="countAliveBySessionId" resultType="int">
+        SELECT COUNT(*) FROM itinerary
+        WHERE session_id = #{sessionId} AND deleted = 0
+    </select>
+
+    <update id="clearSessionId">
+        UPDATE itinerary SET session_id = NULL
+        WHERE session_id = #{sessionId}
+    </update>
+
+    <update id="updatePinned">
+        UPDATE itinerary SET pinned = #{pinned}
+        WHERE id = #{id} AND user_id = #{userId} AND deleted = 0
+    </update>
+
+    <update id="updateStatus">
+        UPDATE itinerary SET status = #{status}
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <update id="softDelete">
+        UPDATE itinerary SET deleted = 1
+        WHERE id = #{id} AND user_id = #{userId} AND deleted = 0
+    </update>
+
+</mapper>

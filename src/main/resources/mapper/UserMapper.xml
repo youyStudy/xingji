@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xingji.mapper.UserMapper">
+
+    <!-- 通用列，避免每处重复写；配合 map-underscore-to-camel-case 自动映射到驼峰属性 -->
+    <sql id="baseColumns">
+        id, phone, email, password, nickname, avatar, avatar_src, gender, role, deleted, create_time, update_time
+    </sql>
+
+    <!-- 静态插入。id/create_time/update_time/deleted 交给数据库默认值，不用手写 -->
+    <insert id="insert" parameterType="User"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `user` (phone, email, password, nickname, avatar, role)
+        VALUES (#{phone}, #{email}, #{password}, #{nickname}, #{avatar}, #{role})
+    </insert>
+
+    <select id="selectById" resultType="User">
+        SELECT <include refid="baseColumns"/>
+        FROM `user`
+        <!-- deleted = 0 表示只取未软删除的用户 -->
+        WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <select id="selectByPhone" resultType="User">
+        SELECT <include refid="baseColumns"/>
+        FROM `user`
+        WHERE phone = #{phone} AND deleted = 0
+    </select>
+
+    <select id="selectByEmail" resultType="User">
+        SELECT <include refid="baseColumns"/>
+        FROM `user`
+        WHERE email = #{email} AND deleted = 0
+    </select>
+
+    <!-- 动态部分更新：<set> 自动去掉末尾多余逗号；String 判 null+空串，Integer 只判 null -->
+    <update id="updateById" parameterType="User">
+        UPDATE `user`
+        <set>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
+            <if test="email != null and email != ''">email = #{email},</if>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="nickname != null and nickname != ''">nickname = #{nickname},</if>
+            <if test="avatar != null and avatar != ''">avatar = #{avatar},</if>
+            <if test="avatarSrc != null and avatarSrc != ''">avatar_src = #{avatarSrc},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="role != null">role = #{role},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>

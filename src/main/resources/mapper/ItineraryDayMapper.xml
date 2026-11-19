@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xingji.mapper.ItineraryDayMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO itinerary_day (itinerary_id, day_index, theme, date)
+        VALUES (#{itineraryId}, #{dayIndex}, #{theme}, #{date})
+    </insert>
+
+    <select id="findByItineraryId" resultType="ItineraryDay">
+        SELECT * FROM itinerary_day
+        WHERE itinerary_id = #{itineraryId}
+        ORDER BY day_index ASC
+    </select>
+
+    <delete id="deleteByItineraryId">
+        DELETE FROM itinerary_day
+        WHERE itinerary_id = #{itineraryId}
+    </delete>
+
+    <select id="findById" resultType="ItineraryDay">
+        SELECT * FROM itinerary_day WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE itinerary_day
+        SET day_index = #{dayIndex}, theme = #{theme}, date = #{date}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM itinerary_day WHERE id = #{id}
+    </delete>
+
+</mapper>

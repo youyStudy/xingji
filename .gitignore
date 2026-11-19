@@ -1,0 +1,24 @@
+# Build output
+target/
+
+# IDE and local workspace metadata
+.idea/
+*.iml
+.vscode/
+
+# Local configuration and secrets
+.env
+.env.*
+application-local.yml
+src/main/resources/application-local.yml
+
+# Logs and local data
+*.log
+logs/
+data/
+uploads/
+mysql-sim/
+
+# OS noise
+.DS_Store
+Thumbs.db

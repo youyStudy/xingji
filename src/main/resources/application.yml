@@ -1,0 +1,97 @@
+spring:
+  config:
+    import: optional:file:./application-local.yml
+  application:
+    name: xingji
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${XINGJI_DB_URL:jdbc:mysql://localhost:3306/xingji}
+    username: ${XINGJI_DB_USERNAME:root}
+    password: ${XINGJI_DB_PASSWORD:}
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      # 缓存只是加速手段:连不上时快速失败并降级到进程内缓存,不能让请求卡在默认 10s 超时上
+      connect-timeout: 500ms
+      timeout: 800ms
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  #给包里面的实体类自动起别名
+  type-aliases-package: com.xingji.pojo
+  configuration:
+    #下划线转驼峰
+    map-underscore-to-camel-case: true
+
+xingji:
+  jwt:
+    # HS256 要求 >= 32 字节；本地值放在被忽略的 application-local.yml 中。
+    secret: ${XINGJI_JWT_SECRET:}
+    expire-minutes: 1440
+  map:
+    amap:
+      key: ${XINGJI_AMAP_KEY:}
+      base-url: https://restapi.amap.com
+      poi-search-path: /v3/place/text
+      weather-path: /v3/weather/weatherInfo
+      direction-path: /v3/direction/
+  oauth:
+    mock: true          # 现在没有真实 app 凭据，mock=true 跳过跳转直接用假数据走通链路
+    qq:
+      client-id: 以后填       # 留占位，将来申请到 QQ 互联的 app-id 替换
+      client-secret: 以后填
+      redirect-uri: http://localhost:8080/api/auth/oauth/qq/callback
+    wechat:
+      client-id: 以后填        # 微信开放平台的 AppID
+      client-secret: 以后填
+      redirect-uri: http://localhost:8080/api/auth/oauth/wechat/callback
+  media:                # 上传照片和视频
+    upload-path: ${XINGJI_UPLOAD_PATH:./uploads}
+    allowed-image: jpg,jpeg,png,webp,gif
+    allowed-video: mp4,mov
+    max-image-size: 10485760
+    max-video-size: 52428800
+  ai:
+    mock: false
+    models:
+      fast:   # 免费·高频档：对话 / AI 二创 / 需求解析都走它
+        base-url: https://open.bigmodel.cn/api/paas/v4
+        api-key: ${XINGJI_AI_API_KEY:}       # 登录 open.bigmodel.cn → API Keys 里创建
+        # GLM-4-Flash 实测多轮时会只回纯文本、丢掉 profile_patch，故对话改用 4.5-Flash。
+        # 它仍属智谱免费档，但更愿意遵守"只输出 JSON 对象"的格式约束。
+        model: GLM-4.5-Flash                 # 智谱免费档，OpenAI 兼容
+        temperature: 0.4                     # 结构化抽取要稳，不追求文采
+        max-tokens: 1024                     # 对话/文案够用，短输出省 token
+        extra-body:                          # 厂商私有参数，原样并进请求体
+          thinking:
+            # 4.5 系列默认先"思考"再回答：实测一次花 400~660 token、10~40 秒，
+            # 极端情况下推理吃满预算、正文为空。对话只做字段抽取，关掉更快也更稳（约 5 秒）。
+            # 注意别在这里加 response_format：同一个 fast 别名还被灵感文案(纯文本)和
+            # 景点推荐(JSON 数组)复用，强制 json_object 会把那两个任务弄坏。
+            type: disabled
+      strong: # 结构化档：生成整棵行程树时用它
+        # 2026-10 实测对比（同一份成都 2 天行程提示词）：
+        #   DeepSeek-R1-0528        146 秒   reasoning_tokens=2393（思考量是正文 8 倍，纯浪费）
+        #   GLM-4.5-Flash 关思考     22~64 秒  但偶发 JSON 语法错误（时间值漏引号）
+        # 结论：用 GLM-4.5-Flash 换掉 R1，速度提升 2~6 倍；它偶发的 JSON 错误由
+        #      JsonRepair + 一次自动重试兜底（ItineraryGenerateServiceImpl.parseOrNull），
+        #      不会让用户白等后直接报错。
+        base-url: https://open.bigmodel.cn/api/paas/v4
+        api-key: ${XINGJI_AI_API_KEY:}
+        model: GLM-4.5-Flash
+        temperature: 0.2                      # 要稳定的结构化输出，压低温度
+        max-tokens: 4000                      # 行程 JSON 较长，给足预算避免被截断
+        extra-body:
+          thinking:
+            type: disabled                    # 生成行程不需要深度推理，关掉思考快 3~5 倍
+    routing: # 任务→用哪个别名
+      ITINERARY_GENERATE: strong
+      CHAT: fast
+      INSPIRATION: fast
+      SPOT_RECOMMEND: fast
